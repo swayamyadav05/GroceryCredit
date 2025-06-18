@@ -1,4 +1,4 @@
-import { getCredits, getCreditsByMonth, createCredit } from "./lib/storage.js";
+import { getCredits, createCredit } from "./lib/storage.js";
 
 export default async function handler(req, res) {
     // Enable CORS
@@ -15,17 +15,9 @@ export default async function handler(req, res) {
     try {
         switch (req.method) {
             case "GET":
-                if (req.query.year && req.query.month) {
-                    // GET /api/credits?year=2025&month=6
-                    const year = parseInt(req.query.year);
-                    const month = parseInt(req.query.month);
-                    const credits = await getCreditsByMonth(year, month);
-                    res.status(200).json(credits);
-                } else {
-                    // GET /api/credits
-                    const credits = await getCredits();
-                    res.status(200).json(credits);
-                }
+                // GET /api/credits
+                const credits = await getCredits();
+                res.status(200).json(credits);
                 break;
 
             case "POST":
