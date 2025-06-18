@@ -29,12 +29,18 @@ export class MongoStorage implements IStorage {
     if (!uri) {
       throw new Error("MONGODB_URI environment variable is required");
     }
-    this.client = new MongoClient(uri, {
+    // Try to parse and modify the URI to disable SSL if needed
+    let connectionUri = uri;
+    if (uri.includes('mongodb+srv://') && !uri.includes('ssl=false')) {
+      connectionUri = uri.includes('?') 
+        ? `${uri}&ssl=false&tlsInsecure=true` 
+        : `${uri}?ssl=false&tlsInsecure=true`;
+    }
+    
+    this.client = new MongoClient(connectionUri, {
       serverSelectionTimeoutMS: 5000,
       connectTimeoutMS: 10000,
       socketTimeoutMS: 45000,
-      tls: true,
-      tlsInsecure: true,
     });
     this.db = this.client.db("credit_tracker");
     this.collection = this.db.collection<MongoCredit>("credits");
@@ -194,8 +200,19 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Temporarily use memory storage while troubleshooting MongoDB
-export const storage = new MemStorage();
+// Use MongoDB storage with fallback to memory storage on connection failure
+let storage: IStorage;
+try {
+  if (process.env.MONGODB_URI) {
+    storage = new MongoStorage();
+    console.log("Attempting to use MongoDB storage");
+  } else {
+    storage = new MemStorage();
+    console.log("Using memory storage - no MongoDB URI provided");
+  }
+} catch (error) {
+  console.error("Failed to initialize MongoDB storage, falling back to memory storage:", error);
+  storage = new MemStorage();
+}
 
-// Alternative MongoDB storage ready when connection is fixed
-// export const storage = process.env.MONGODB_URI ? new MongoStorage() : new MemStorage();
+export { storage };
