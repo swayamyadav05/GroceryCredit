@@ -1,10 +1,10 @@
-import {
+const {
     getCredits,
     getCreditsByMonth,
     createCredit,
-} from "../server/storage.js";
+} = require("./lib/storage.js");
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     // Enable CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -43,6 +43,9 @@ export default async function handler(req, res) {
         }
     } catch (error) {
         console.error("API Error:", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({
+            message: "Internal server error",
+            error: error.message,
+        });
     }
-}
+};

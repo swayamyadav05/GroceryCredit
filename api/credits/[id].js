@@ -1,6 +1,6 @@
-import { updateCredit, deleteCredit } from "../../server/storage.js";
+const { updateCredit, deleteCredit } = require("../../lib/storage.js");
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     // Enable CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "PATCH, DELETE, OPTIONS");
@@ -45,6 +45,9 @@ export default async function handler(req, res) {
         }
     } catch (error) {
         console.error("API Error:", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({
+            message: "Internal server error",
+            error: error.message,
+        });
     }
-}
+};
