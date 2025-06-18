@@ -29,15 +29,29 @@ export class MongoStorage implements IStorage {
     if (!uri) {
       throw new Error("MONGODB_URI environment variable is required");
     }
-    this.client = new MongoClient(uri);
+    this.client = new MongoClient(uri, {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      tls: true,
+      tlsInsecure: true,
+    });
     this.db = this.client.db("credit_tracker");
     this.collection = this.db.collection<MongoCredit>("credits");
   }
 
   private async ensureConnection(): Promise<void> {
     if (!this.connected) {
-      await this.client.connect();
-      this.connected = true;
+      try {
+        await this.client.connect();
+        // Test the connection
+        await this.db.admin().ping();
+        this.connected = true;
+        console.log("MongoDB connected successfully");
+      } catch (error) {
+        console.error("MongoDB connection failed:", error);
+        throw new Error(`Database connection failed: ${error}`);
+      }
     }
   }
 
@@ -180,5 +194,8 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use MongoDB if available, fallback to memory storage
-export const storage = process.env.MONGODB_URI ? new MongoStorage() : new MemStorage();
+// Temporarily use memory storage while troubleshooting MongoDB
+export const storage = new MemStorage();
+
+// Alternative MongoDB storage ready when connection is fixed
+// export const storage = process.env.MONGODB_URI ? new MongoStorage() : new MemStorage();
