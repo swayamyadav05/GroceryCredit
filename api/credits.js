@@ -1,10 +1,6 @@
-const {
-    getCredits,
-    getCreditsByMonth,
-    createCredit,
-} = require("./lib/storage.js");
+import { getCredits, getCreditsByMonth, createCredit } from "./lib/storage.js";
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
     // Enable CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -48,4 +44,4 @@ module.exports = async function handler(req, res) {
             error: error.message,
         });
     }
-};
+}
