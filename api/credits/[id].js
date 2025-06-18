@@ -1,4 +1,32 @@
-import { updateCredit, deleteCredit } from "../../lib/storage.js";
+import pkg from "pg";
+const { Pool } = pkg;
+import { drizzle } from "drizzle-orm/node-postgres";
+import { credits } from "../../../shared/schema.js";
+import { eq } from "drizzle-orm";
+import "dotenv/config";
+
+const pool = new Pool({
+    connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL,
+});
+
+const db = drizzle(pool);
+
+async function updateCredit(id, update) {
+    const [updated] = await db
+        .update(credits)
+        .set(update)
+        .where(eq(credits.id, id))
+        .returning();
+    return updated ?? null;
+}
+
+async function deleteCredit(id) {
+    const result = await db
+        .delete(credits)
+        .where(eq(credits.id, id))
+        .returning();
+    return result.length > 0;
+}
 
 export default async function handler(req, res) {
     // Enable CORS
