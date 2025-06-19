@@ -35,9 +35,9 @@ export default function Home() {
                         <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 rounded-lg flex items-center justify-center">
                                 <img
-                                    src="/images/UdharooLogo.png"
+                                    src="/images/UdhaaroLogo.png"
                                     alt="App Logo"
-                                    className="w-48px h-48px"
+                                    className="w-12 h-12"
                                 />
                             </div>
                             <div>
