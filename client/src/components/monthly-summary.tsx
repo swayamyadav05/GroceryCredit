@@ -22,6 +22,18 @@ export default function MonthlySummary({
     const count = credits.length;
     const average = count > 0 ? total / count : 0;
 
+    // Count total items by splitting descriptions by comma, trimming, and filtering out empty items
+    const itemCount = credits.reduce((sum, credit) => {
+        if (!credit.description) return sum;
+        return (
+            sum +
+            credit.description
+                .split(",")
+                .map((item) => item.trim())
+                .filter((item) => item.length > 0).length
+        );
+    }, 0);
+
     const changeMonth = (direction: "prev" | "next") => {
         const newDate = { ...currentDate };
         if (direction === "prev") {
@@ -51,8 +63,11 @@ export default function MonthlySummary({
                     </div>
                     <div>
                         <h2
-                            className="text-xl font-semibold"
+                            className="text-xl font-semibold truncate min-w-0 block"
                             style={{ color: "var(--text-main)" }}
+                            title={`${getMonthName(currentDate.month)} ${
+                                currentDate.year
+                            }`}
                         >
                             {getMonthName(currentDate.month)} {currentDate.year}
                         </h2>
@@ -105,7 +120,7 @@ export default function MonthlySummary({
                                 Total Items
                             </p>
                             <p className="text-2xl font-bold text-secondary">
-                                {count}
+                                {itemCount}
                             </p>
                         </div>
                         <div className="w-10 h-10 bg-secondary/20 rounded-lg flex items-center justify-center">

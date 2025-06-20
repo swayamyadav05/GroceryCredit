@@ -200,8 +200,8 @@ export default function CreditList({ credits, isLoading }: CreditListProps) {
                     <div className="divide-y divide-gray-100">
                         {credits.map((credit) => (
                             <div key={credit.id} className="transaction-row">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-4 flex-1">
+                                <div className="flex items-center justify-between min-w-0">
+                                    <div className="flex items-center space-x-4 flex-1 min-w-0">
                                         <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
                                             <Receipt
                                                 className="text-primary"
@@ -210,23 +210,34 @@ export default function CreditList({ credits, isLoading }: CreditListProps) {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between">
-                                                <div>
+                                                <div className="min-w-0">
                                                     <h3
-                                                        className="text-lg font-medium truncate"
+                                                        className="text-lg font-medium truncate min-w-0 block"
                                                         style={{
                                                             color: "var(--text-main)",
                                                         }}
+                                                        title={
+                                                            credit.description
+                                                        }
                                                     >
                                                         {credit.description}
                                                     </h3>
-                                                    <p className="text-sm text-gray-600 mt-1">
+                                                    <p
+                                                        className="text-sm text-gray-600 mt-1 truncate min-w-0 block"
+                                                        title={credit.date}
+                                                    >
                                                         {formatDate(
                                                             credit.date
                                                         )}
                                                     </p>
                                                 </div>
-                                                <div className="text-right ml-4">
-                                                    <p className="text-xl font-bold text-primary">
+                                                <div className="text-right ml-4 min-w-0">
+                                                    <p
+                                                        className="text-xl font-bold text-primary truncate min-w-0 block"
+                                                        title={formatCurrency(
+                                                            credit.amount
+                                                        )}
+                                                    >
                                                         {formatCurrency(
                                                             credit.amount
                                                         )}
