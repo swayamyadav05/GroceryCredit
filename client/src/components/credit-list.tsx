@@ -6,7 +6,7 @@ import {
     Trash2,
     Receipt,
     Calendar,
-    DollarSign,
+    IndianRupee,
     ShoppingBag,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -353,7 +353,7 @@ export default function CreditList({ credits, isLoading }: CreditListProps) {
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="edit-amount" className="text-right">
-                                <DollarSign
+                                <IndianRupee
                                     className="inline text-gray-500 mr-2"
                                     size={16}
                                 />
