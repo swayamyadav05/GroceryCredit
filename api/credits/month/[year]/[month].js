@@ -1,6 +1,6 @@
 import express from "express";
 import { getCreditsByMonth } from "../../../lib/storage.js";
-import { sessionMiddleware, withAuth } from "../../../lib/auth.js";
+import { withAuth } from "../../../lib/auth.js";
 
 const app = express();
 
@@ -23,7 +23,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(sessionMiddleware);
 app.use(express.json());
 
 async function monthlyCreditsHandler(req, res) {

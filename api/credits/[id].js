@@ -1,5 +1,5 @@
 import express from "express";
-import { sessionMiddleware, withAuth } from "../lib/auth.js";
+import { withAuth } from "../lib/auth.js";
 import pkg from "pg";
 const { Pool } = pkg;
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -34,7 +34,6 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(sessionMiddleware);
 app.use(express.json());
 
 async function updateCredit(id, update) {

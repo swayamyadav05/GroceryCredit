@@ -1,9 +1,7 @@
 import express from "express";
-import { sessionMiddleware, withAuth } from "../lib/auth.js";
+import { withAuth } from "../lib/auth.js";
 
 const app = express();
-
-app.use(sessionMiddleware);
 
 function statusHandler(req, res) {
     // withAuth will have already validated the session
