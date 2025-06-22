@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "a-very-secret-key";
-const JWT_EXPIRES_IN = "7d"; // 7 days
+const JWT_EXPIRES_IN = "14d"; // 14 days
 
 export default async function handler(req, res) {
     // CORS
