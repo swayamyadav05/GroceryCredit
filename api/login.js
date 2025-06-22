@@ -24,6 +24,7 @@ app.use(
             sameSite: "lax",
             maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
         },
+        name: "connect.sid",
     })
 );
 
@@ -33,7 +34,13 @@ app.post("/api/login", (req, res) => {
     if (password === process.env.APP_PASSWORD) {
         if (req.session) {
             req.session.isAuthenticated = true;
+            console.log("[DEBUG] After setting isAuthenticated:", req.session);
             req.session.save(() => {
+                // Log Set-Cookie header
+                console.log(
+                    "[DEBUG] Set-Cookie header:",
+                    res.getHeader("Set-Cookie")
+                );
                 return res.status(200).json({ message: "Login successful" });
             });
         } else {
