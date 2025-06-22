@@ -4,21 +4,29 @@ import { sessionMiddleware, withAuth } from "./lib/auth.js";
 
 const app = express();
 
-app.use(sessionMiddleware);
-app.use(express.json());
-
-async function creditsHandler(req, res) {
-    // Enable CORS
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+// CORS middleware at the very top
+app.use((req, res, next) => {
+    res.setHeader(
+        "Access-Control-Allow-Origin",
+        "https://grocery-credit.vercel.app"
+    );
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PATCH, DELETE, OPTIONS"
+    );
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-    // Handle preflight requests
     if (req.method === "OPTIONS") {
         res.status(200).end();
         return;
     }
+    next();
+});
 
+app.use(sessionMiddleware);
+app.use(express.json());
+
+async function creditsHandler(req, res) {
     try {
         switch (req.method) {
             case "GET":

@@ -4,6 +4,26 @@ import connectPgSimple from "connect-pg-simple";
 import "dotenv/config";
 
 const app = express();
+
+// CORS middleware at the very top
+app.use((req, res, next) => {
+    res.setHeader(
+        "Access-Control-Allow-Origin",
+        "https://grocery-credit.vercel.app"
+    );
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PATCH, DELETE, OPTIONS"
+    );
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    if (req.method === "OPTIONS") {
+        res.status(200).end();
+        return;
+    }
+    next();
+});
+
 app.use(express.json());
 
 const sessionStore = new (connectPgSimple(session))({
@@ -27,22 +47,6 @@ app.use(
         name: "connect.sid",
     })
 );
-
-// CORS middleware for this endpoint
-app.use((req, res, next) => {
-    res.setHeader(
-        "Access-Control-Allow-Origin",
-        "https://grocery-credit.vercel.app"
-    );
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-    if (req.method === "OPTIONS") {
-        res.status(200).end();
-        return;
-    }
-    next();
-});
 
 app.post("/api/login", (req, res) => {
     const { password } = req.body;

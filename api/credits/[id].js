@@ -15,6 +15,25 @@ const db = drizzle(pool);
 
 const app = express();
 
+// CORS middleware at the very top
+app.use((req, res, next) => {
+    res.setHeader(
+        "Access-Control-Allow-Origin",
+        "https://grocery-credit.vercel.app"
+    );
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, PATCH, DELETE, OPTIONS"
+    );
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    if (req.method === "OPTIONS") {
+        res.status(200).end();
+        return;
+    }
+    next();
+});
+
 app.use(sessionMiddleware);
 app.use(express.json());
 
@@ -36,27 +55,13 @@ async function deleteCredit(id) {
 }
 
 async function idHandler(req, res) {
-    // Enable CORS
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "PATCH, DELETE, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-    // Handle preflight requests
-    if (req.method === "OPTIONS") {
-        res.status(200).end();
-        return;
-    }
-
     try {
         const id = parseInt(req.query.id);
-
         if (isNaN(id)) {
             return res.status(400).json({ message: "Invalid credit ID" });
         }
-
         switch (req.method) {
             case "PATCH":
-                // PATCH /api/credits/[id]
                 const updatedCredit = await updateCredit(id, req.body);
                 if (!updatedCredit) {
                     res.status(404).json({ message: "Credit not found" });
@@ -64,9 +69,7 @@ async function idHandler(req, res) {
                     res.status(200).json(updatedCredit);
                 }
                 break;
-
             case "DELETE":
-                // DELETE /api/credits/[id]
                 const deleted = await deleteCredit(id);
                 if (!deleted) {
                     res.status(404).json({ message: "Credit not found" });
@@ -74,7 +77,6 @@ async function idHandler(req, res) {
                     res.status(204).end();
                 }
                 break;
-
             default:
                 res.status(405).json({ message: "Method not allowed" });
         }
