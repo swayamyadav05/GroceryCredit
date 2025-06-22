@@ -35,6 +35,24 @@ export default async function handler(req, res) {
         return;
     }
 
+    // Manually parse body for Vercel
+    if (req.method === "POST" && !req.body) {
+        await new Promise((resolve) => {
+            let body = "";
+            req.on("data", (chunk) => {
+                body += chunk;
+            });
+            req.on("end", () => {
+                try {
+                    req.body = JSON.parse(body);
+                } catch {
+                    req.body = {};
+                }
+                resolve();
+            });
+        });
+    }
+
     // Run session middleware
     await new Promise((resolve, reject) => {
         sessionMiddleware(req, res, (err) => (err ? reject(err) : resolve()));
