@@ -1,12 +1,12 @@
-# GroceryCredit
+# Udhaaro
 
 ## 💡 Personal Story
 
-One day, my mom asked me to help her keep track of grocery items and the money spent, which she had been recording manually in a notebook. Wanting to make things easier and modern for her, and to work on building a real-world app, I created GroceryCredit. This app is dedicated to her, and to anyone who wants a simple, digital way to manage grocery credits.
+One day, my mom asked me to help her keep track of grocery items and the money spent, which she had been recording manually in a notebook. Wanting to make things easier and modern for her, and to work on building a real-world app, I created Udhaaro. This app is dedicated to her, and to anyone who wants a simple, digital way to manage grocery expenses.
 
 ## 🚀 Project Overview
 
-GroceryCredit helps you manage and track your grocery expenses and credits efficiently. It provides a clean UI for adding, viewing, editing, and deleting your monthly grocery credits, with a robust backend and cloud database support.
+Udhaaro helps you manage and track your grocery expenses and credits efficiently. It provides a clean UI for adding, viewing, editing, and deleting your monthly grocery credits, with a robust backend and cloud database support.
 
 ## ✨ Features
 
@@ -31,7 +31,7 @@ GroceryCredit helps you manage and track your grocery expenses and credits effic
 ## 📁 Project Structure
 
 ```
-GroceryCredit/
+Udhaaro/
 ├── api/                    # Vercel serverless API functions
 │   ├── credits/           # Credit-related API endpoints
 │   │   ├── [id].js       # Individual credit operations (PATCH, DELETE)

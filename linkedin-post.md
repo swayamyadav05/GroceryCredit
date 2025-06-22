@@ -1,6 +1,6 @@
-# LinkedIn Post: GroceryCredit - A Full-Stack Journey from MongoDB to PostgreSQL
+# LinkedIn Post: Udhaaro - A Full-Stack Journey from MongoDB to PostgreSQL
 
-🚀 **Just deployed my latest full-stack project: GroceryCredit!**
+🚀 **Just deployed my latest full-stack project: Udhaaro!**
 
 **The Story:**
 My mom was manually tracking grocery credits in a notebook, so I built her a modern web app. What started as a simple request turned into a comprehensive full-stack application with some interesting technical challenges along the way.

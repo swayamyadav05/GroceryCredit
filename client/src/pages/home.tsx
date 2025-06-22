@@ -45,7 +45,7 @@ export default function Home() {
                                     className="text-2xl font-bold"
                                     style={{ color: "var(--text-main)" }}
                                 >
-                                    Credit Tracker
+                                    Udhaaro
                                 </h1>
                                 <p className="text-sm text-gray-600">
                                     Grocery Store Credits
