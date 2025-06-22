@@ -25,12 +25,21 @@ function App() {
     useEffect(() => {
         const checkAuthStatus = async () => {
             try {
-                const response = await fetch("/api/auth/status");
+                const token =
+                    typeof window !== "undefined"
+                        ? localStorage.getItem("jwt")
+                        : null;
+                const headers: Record<string, string> = {};
+                if (token) headers["Authorization"] = `Bearer ${token}`;
+                const response = await fetch("/api/auth/status", { headers });
                 if (response.ok) {
                     setIsAuthenticated(true);
+                } else if (response.status === 401) {
+                    localStorage.removeItem("jwt");
+                    setIsAuthenticated(false);
                 }
             } catch (error) {
-                console.error("Failed to check auth status:", error);
+                setIsAuthenticated(false);
             } finally {
                 setIsLoading(false);
             }

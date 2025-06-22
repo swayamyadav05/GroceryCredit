@@ -23,6 +23,10 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
             });
 
             if (response.ok) {
+                const data = await response.json();
+                if (data.token) {
+                    localStorage.setItem("jwt", data.token);
+                }
                 toast({
                     title: "Login Successful",
                     description: "Welcome!",

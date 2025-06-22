@@ -1,25 +1,7 @@
-import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
-import "dotenv/config";
+import jwt from "jsonwebtoken";
 
-const sessionStore = new (connectPgSimple(session))({
-    conString: process.env.POSTGRES_URL,
-    tableName: "user_sessions",
-});
-
-const sessionMiddleware = session({
-    store: sessionStore,
-    secret: process.env.SESSION_SECRET || "a-secret-key-for-development",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: process.env.NODE_ENV === "production",
-        httpOnly: true,
-        sameSite: "lax",
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-    },
-    name: "connect.sid",
-});
+const JWT_SECRET = process.env.JWT_SECRET || "a-very-secret-key";
+const JWT_EXPIRES_IN = "7d"; // 7 days
 
 export default async function handler(req, res) {
     // CORS
@@ -29,7 +11,10 @@ export default async function handler(req, res) {
     );
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization"
+    );
     if (req.method === "OPTIONS") {
         res.status(200).end();
         return;
@@ -53,18 +38,14 @@ export default async function handler(req, res) {
         });
     }
 
-    // Run session middleware
-    await new Promise((resolve, reject) => {
-        sessionMiddleware(req, res, (err) => (err ? reject(err) : resolve()));
-    });
-
     if (req.method === "POST") {
         const { password } = req.body || {};
         if (password === process.env.APP_PASSWORD) {
-            req.session.isAuthenticated = true;
-            req.session.save(() => {
-                res.status(200).json({ message: "Login successful" });
+            // Create JWT
+            const token = jwt.sign({ authenticated: true }, JWT_SECRET, {
+                expiresIn: JWT_EXPIRES_IN,
             });
+            res.status(200).json({ token });
         } else {
             res.status(401).json({ message: "Invalid password" });
         }

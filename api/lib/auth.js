@@ -1,33 +1,24 @@
-import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
-import "dotenv/config";
+import jwt from "jsonwebtoken";
 
-const sessionStore = new (connectPgSimple(session))({
-    conString: process.env.POSTGRES_URL,
-    tableName: "user_sessions",
-    createTableIf_NotExist: true,
-});
-
-export const sessionMiddleware = session({
-    store: sessionStore,
-    secret: process.env.SESSION_SECRET || "a-secret-key-for-development",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: process.env.NODE_ENV === "production",
-        httpOnly: true,
-        sameSite: "lax",
-        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-    },
-});
+const JWT_SECRET = process.env.JWT_SECRET || "a-very-secret-key";
 
 export function withAuth(handler) {
     return (req, res) => {
-        console.log("[DEBUG] Session:", req.session);
-        if (req.session && req.session.isAuthenticated) {
-            return handler(req, res);
-        } else {
-            return res.status(401).json({ message: "Not authenticated" });
+        // Check for JWT in Authorization header
+        const authHeader =
+            req.headers["authorization"] || req.headers["Authorization"];
+        if (authHeader && authHeader.startsWith("Bearer ")) {
+            const token = authHeader.slice(7);
+            try {
+                const decoded = jwt.verify(token, JWT_SECRET);
+                if (decoded && decoded.authenticated) {
+                    req.user = decoded;
+                    return handler(req, res);
+                }
+            } catch (err) {
+                // Invalid token
+            }
         }
+        return res.status(401).json({ message: "Not authenticated" });
     };
 }
