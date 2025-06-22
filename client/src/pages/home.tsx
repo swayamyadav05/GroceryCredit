@@ -70,7 +70,7 @@ export default function Home() {
                                     size="sm"
                                     className="ml-2"
                                     onClick={() => {
-                                        localStorage.removeItem("token");
+                                        localStorage.removeItem("jwt");
                                         window.location.reload();
                                     }}
                                 >
