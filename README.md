@@ -2,7 +2,7 @@
 
 ## 💡 Personal Story
 
-One day, my mom asked me to help her keep track of grocery items and the money spent, which she had been recording manually in a notebook. Wanting to make things easier and modern for her, and to work on building a real-world app, I created Udhaaro. This app is dedicated to her, and to anyone who wants a simple, digital way to manage grocery expenses.
+One day, my mom asked me to help her keep track of grocery items and the money credited, which she had been recording manually in a notebook. Wanting to make things easier and modern for her, and to work on building a real-world app, I created Udhaaro. This app is dedicated to her, and to anyone who wants a simple, digital way to manage grocery expenses.
 
 ## 🚀 Project Overview
 
