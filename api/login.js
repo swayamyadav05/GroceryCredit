@@ -1,76 +1,56 @@
-import express from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import "dotenv/config";
 
-const app = express();
+const sessionStore = new (connectPgSimple(session))({
+    conString: process.env.POSTGRES_URL,
+    tableName: "user_sessions",
+});
 
-// CORS middleware at the very top
-app.use((req, res, next) => {
+const sessionMiddleware = session({
+    store: sessionStore,
+    secret: process.env.SESSION_SECRET || "a-secret-key-for-development",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    },
+    name: "connect.sid",
+});
+
+export default async function handler(req, res) {
+    // CORS
     res.setHeader(
         "Access-Control-Allow-Origin",
         "https://grocery-credit.vercel.app"
     );
     res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader(
-        "Access-Control-Allow-Methods",
-        "GET, POST, PATCH, DELETE, OPTIONS"
-    );
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     if (req.method === "OPTIONS") {
         res.status(200).end();
         return;
     }
-    next();
-});
 
-app.use(express.json());
+    // Run session middleware
+    await new Promise((resolve, reject) => {
+        sessionMiddleware(req, res, (err) => (err ? reject(err) : resolve()));
+    });
 
-const sessionStore = new (connectPgSimple(session))({
-    conString: process.env.POSTGRES_URL,
-    tableName: "user_sessions",
-    createTableIf_NotExist: true,
-});
-
-app.use(
-    session({
-        store: sessionStore,
-        secret: process.env.SESSION_SECRET || "a-secret-key-for-development",
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            secure: process.env.NODE_ENV === "production",
-            httpOnly: true,
-            sameSite: "lax",
-            maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-        },
-        name: "connect.sid",
-    })
-);
-
-app.post("/api/login", (req, res) => {
-    const { password } = req.body;
-
-    if (password === process.env.APP_PASSWORD) {
-        if (req.session) {
+    if (req.method === "POST") {
+        const { password } = req.body || {};
+        if (password === process.env.APP_PASSWORD) {
             req.session.isAuthenticated = true;
-            console.log("[DEBUG] After setting isAuthenticated:", req.session);
             req.session.save(() => {
-                // Log Set-Cookie header
-                console.log(
-                    "[DEBUG] Set-Cookie header:",
-                    res.getHeader("Set-Cookie")
-                );
-                return res.status(200).json({ message: "Login successful" });
+                res.status(200).json({ message: "Login successful" });
             });
         } else {
-            return res
-                .status(500)
-                .json({ message: "Session could not be established." });
+            res.status(401).json({ message: "Invalid password" });
         }
     } else {
-        return res.status(401).json({ message: "Invalid password" });
+        res.status(405).json({ message: "Method not allowed" });
     }
-});
-
-export default app;
+}
