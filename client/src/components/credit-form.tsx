@@ -31,12 +31,13 @@ export default function CreditForm() {
             const response = await apiRequest("POST", "/api/credits", data);
             return response.json();
         },
-        onSuccess: () => {
+        onSuccess: (_data, variables) => {
+            const date = new Date(variables.date);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
             queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
             queryClient.invalidateQueries({
-                queryKey: [
-                    `/api/credits/month/${currentDate.year}/${currentDate.month}`,
-                ],
+                queryKey: [`/api/credits/month/${year}/${month}`],
             });
             form.reset({
                 date: new Date().toISOString().split("T")[0],
