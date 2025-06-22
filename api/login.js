@@ -28,6 +28,22 @@ app.use(
     })
 );
 
+// CORS middleware for this endpoint
+app.use((req, res, next) => {
+    res.setHeader(
+        "Access-Control-Allow-Origin",
+        "https://grocery-credit.vercel.app"
+    );
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    if (req.method === "OPTIONS") {
+        res.status(200).end();
+        return;
+    }
+    next();
+});
+
 app.post("/api/login", (req, res) => {
     const { password } = req.body;
 
