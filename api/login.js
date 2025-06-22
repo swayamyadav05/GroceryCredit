@@ -21,6 +21,7 @@ app.use(
         cookie: {
             secure: process.env.NODE_ENV === "production",
             httpOnly: true,
+            sameSite: "lax",
             maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
         },
     })
@@ -32,11 +33,14 @@ app.post("/api/login", (req, res) => {
     if (password === process.env.APP_PASSWORD) {
         if (req.session) {
             req.session.isAuthenticated = true;
-            return res.status(200).json({ message: "Login successful" });
+            req.session.save(() => {
+                return res.status(200).json({ message: "Login successful" });
+            });
+        } else {
+            return res
+                .status(500)
+                .json({ message: "Session could not be established." });
         }
-        return res
-            .status(500)
-            .json({ message: "Session could not be established." });
     } else {
         return res.status(401).json({ message: "Invalid password" });
     }
