@@ -23,6 +23,7 @@ export const sessionMiddleware = session({
 
 export function withAuth(handler) {
     return (req, res) => {
+        console.log("[DEBUG] Session:", req.session);
         if (req.session && req.session.isAuthenticated) {
             return handler(req, res);
         } else {
