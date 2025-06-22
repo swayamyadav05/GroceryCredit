@@ -10,6 +10,7 @@ import ComparisonCard from "@/components/comparison-card";
 import type { Credit } from "@shared/schema";
 
 export default function Home() {
+    const showLogoutButton = true; // Set to false to hide logout button
     const [currentDate, setCurrentDate] = useState(getCurrentMonth());
 
     const { data: credits = [], isLoading } = useQuery<Credit[]>({
@@ -52,16 +53,31 @@ export default function Home() {
                                 </p>
                             </div>
                         </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200"
-                        >
-                            <Settings
-                                size={20}
-                                style={{ color: "var(--text-main)" }}
-                            />
-                        </Button>
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-10 h-10 bg-gray-100 rounded-lg hover:bg-gray-200"
+                            >
+                                <Settings
+                                    size={20}
+                                    style={{ color: "var(--text-main)" }}
+                                />
+                            </Button>
+                            {showLogoutButton && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="ml-2"
+                                    onClick={() => {
+                                        localStorage.removeItem("token");
+                                        window.location.reload();
+                                    }}
+                                >
+                                    Logout
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </div>
             </header>
@@ -76,7 +92,7 @@ export default function Home() {
 
                 {/* Add Credit Form */}
                 <div id="credit-form">
-                    <CreditForm />
+                    <CreditForm onCreditAdded={setCurrentDate} />
                 </div>
 
                 {/* Credits List */}

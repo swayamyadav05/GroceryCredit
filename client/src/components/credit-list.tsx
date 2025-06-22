@@ -55,15 +55,16 @@ export default function CreditList({ credits, isLoading }: CreditListProps) {
     });
 
     const deleteCreditMutation = useMutation({
-        mutationFn: async (id: number) => {
-            await apiRequest("DELETE", `/api/credits/${id}`);
+        mutationFn: async (credit: Credit) => {
+            await apiRequest("DELETE", `/api/credits/${credit.id}`);
         },
-        onSuccess: () => {
+        onSuccess: (_data, variables) => {
+            const date = new Date(variables.date);
+            const year = date.getFullYear();
+            const month = date.getMonth() + 1;
             queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
             queryClient.invalidateQueries({
-                queryKey: [
-                    `/api/credits/month/${currentDate.year}/${currentDate.month}`,
-                ],
+                queryKey: [`/api/credits/month/${year}/${month}`],
             });
             toast({
                 title: "Success",
@@ -80,21 +81,38 @@ export default function CreditList({ credits, isLoading }: CreditListProps) {
     });
 
     const updateCreditMutation = useMutation({
-        mutationFn: async ({ id, data }: { id: number; data: any }) => {
+        mutationFn: async ({
+            id,
+            data,
+            originalDate,
+        }: {
+            id: number;
+            data: any;
+            originalDate: string;
+        }) => {
             const response = await apiRequest(
                 "PATCH",
                 `/api/credits/${id}`,
                 data
             );
-            return response.json();
+            return { updated: await response.json(), originalDate };
         },
-        onSuccess: () => {
+        onSuccess: (result, variables) => {
+            const oldDate = new Date(result.originalDate);
+            const oldYear = oldDate.getFullYear();
+            const oldMonth = oldDate.getMonth() + 1;
+            const newDate = new Date(variables.data.date);
+            const newYear = newDate.getFullYear();
+            const newMonth = newDate.getMonth() + 1;
             queryClient.invalidateQueries({ queryKey: ["/api/credits"] });
             queryClient.invalidateQueries({
-                queryKey: [
-                    `/api/credits/month/${currentDate.year}/${currentDate.month}`,
-                ],
+                queryKey: [`/api/credits/month/${oldYear}/${oldMonth}`],
             });
+            if (oldYear !== newYear || oldMonth !== newMonth) {
+                queryClient.invalidateQueries({
+                    queryKey: [`/api/credits/month/${newYear}/${newMonth}`],
+                });
+            }
             setEditingCredit(null);
             setEditForm({ date: "", description: "", amount: "" });
             toast({
@@ -112,7 +130,10 @@ export default function CreditList({ credits, isLoading }: CreditListProps) {
     });
 
     const handleDelete = (id: number) => {
-        deleteCreditMutation.mutate(id);
+        const credit = credits.find((c) => c.id === id);
+        if (credit) {
+            deleteCreditMutation.mutate(credit);
+        }
     };
 
     const handleEdit = (credit: Credit) => {
@@ -129,6 +150,7 @@ export default function CreditList({ credits, isLoading }: CreditListProps) {
             updateCreditMutation.mutate({
                 id: editingCredit.id,
                 data: editForm,
+                originalDate: editingCredit.date,
             });
         }
     };

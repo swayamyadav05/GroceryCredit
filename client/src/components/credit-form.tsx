@@ -12,7 +12,9 @@ import { apiRequest } from "@/lib/queryClient";
 import { insertCreditSchema, type InsertCredit } from "@shared/schema";
 import { getCurrentMonth } from "@/lib/utils";
 
-export default function CreditForm() {
+export default function CreditForm({
+    onCreditAdded,
+}: { onCreditAdded?: (date: { year: number; month: number }) => void } = {}) {
     const { toast } = useToast();
     const queryClient = useQueryClient();
     const currentDate = getCurrentMonth();
@@ -44,6 +46,9 @@ export default function CreditForm() {
                 description: "",
                 amount: "",
             });
+            if (onCreditAdded) {
+                onCreditAdded({ year, month });
+            }
             toast({
                 title: "Success",
                 description: "Credit entry added successfully",
