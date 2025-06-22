@@ -1,3 +1,5 @@
+import express from "express";
+import { sessionMiddleware, withAuth } from "../lib/auth.js";
 import pkg from "pg";
 const { Pool } = pkg;
 import { drizzle } from "drizzle-orm/node-postgres";
@@ -10,6 +12,11 @@ const pool = new Pool({
 });
 
 const db = drizzle(pool);
+
+const app = express();
+
+app.use(sessionMiddleware);
+app.use(express.json());
 
 async function updateCredit(id, update) {
     const [updated] = await db
@@ -28,7 +35,7 @@ async function deleteCredit(id) {
     return result.length > 0;
 }
 
-export default async function handler(req, res) {
+async function idHandler(req, res) {
     // Enable CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "PATCH, DELETE, OPTIONS");
@@ -79,3 +86,7 @@ export default async function handler(req, res) {
         });
     }
 }
+
+app.all("/api/credits/:id", withAuth(idHandler));
+
+export default app;

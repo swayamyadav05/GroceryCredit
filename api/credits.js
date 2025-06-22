@@ -1,6 +1,13 @@
+import express from "express";
 import { getCredits, createCredit } from "./lib/storage.js";
+import { sessionMiddleware, withAuth } from "./lib/auth.js";
 
-export default async function handler(req, res) {
+const app = express();
+
+app.use(sessionMiddleware);
+app.use(express.json());
+
+async function creditsHandler(req, res) {
     // Enable CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -37,3 +44,8 @@ export default async function handler(req, res) {
         });
     }
 }
+
+// Wrap the handler with the authentication check
+app.all("/api/credits", withAuth(creditsHandler));
+
+export default app;

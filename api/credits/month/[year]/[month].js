@@ -1,6 +1,13 @@
+import express from "express";
 import { getCreditsByMonth } from "../../../lib/storage.js";
+import { sessionMiddleware, withAuth } from "../../../lib/auth.js";
 
-export default async function handler(req, res) {
+const app = express();
+
+app.use(sessionMiddleware);
+app.use(express.json());
+
+async function monthlyCreditsHandler(req, res) {
     // Enable CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -36,3 +43,7 @@ export default async function handler(req, res) {
         });
     }
 }
+
+app.all("/api/credits/month/:year/:month", withAuth(monthlyCreditsHandler));
+
+export default app;
