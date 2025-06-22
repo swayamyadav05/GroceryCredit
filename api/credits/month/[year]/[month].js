@@ -30,7 +30,13 @@ async function monthlyCreditsHandler(req, res) {
                     .json({ message: "Invalid year or month" });
             }
 
+            // Log the query parameters
             const credits = await getCreditsByMonth(year, month);
+            console.log("[DEBUG] /api/credits/month:", {
+                year,
+                month,
+                credits,
+            });
             res.status(200).json(credits);
         } else {
             res.status(405).json({ message: "Method not allowed" });
